@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Search</title>
+</head>
+<body>
+    <!-- Your HTML content goes here -->
+
+    <script>
+        function getLocationAndSearch() {
+            if (navigator.geolocation) {
+                // Request permission to access geolocation
+                navigator.geolocation.getCurrentPosition(position => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    console.log("Latitude: " + latitude + ", Longitude: " + longitude);
+                    // Send latitude and longitude to backend
+                    sendLocationToBackend(latitude, longitude);
+                }, error => {
+                    console.error('Error getting geolocation:', error);
+                });
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+            }
+        }
+
+        // Function to send location data to backend
+        function sendLocationToBackend(latitude, longitude) {
+            // Prepare the request body
+            const requestBody = {
+                targetLatitude: latitude,
+                targetLongitude: longitude,
+                maxDistance: 10 // Adjust max distance as needed
+            };
+
+            // Send an HTTP POST request to the backend endpoint
+            fetch('http://localhost:8080/api/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response data (list of cars near the user's location)
+                console.log('Cars near your location:', data);
+            })
+            .catch(error => {
+                console.error('Error fetching nearby cars:', error);
+            });
+        }
+
+        // Example usage: Call getLocationAndSearch() when the page loads
+        getLocationAndSearch();
+    </script>
+</body>
+</html>
